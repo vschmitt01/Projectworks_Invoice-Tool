@@ -21,22 +21,6 @@ with col2:
 
 
 # -------------------------
-# File previews
-# -------------------------
-preview_rows = 10
-
-if burn_file:
-    df_burn_preview = pd.read_csv(burn_file, thousands=",")
-    st.subheader("Preview – Monthly Burn")
-    st.dataframe(df_burn_preview.head(preview_rows), use_container_width=True)
-
-if invoice_file:
-    df_invoice_preview = pd.read_csv(invoice_file, thousands=",")
-    st.subheader("Preview – Invoices")
-    st.dataframe(df_invoice_preview.head(preview_rows), use_container_width=True)
-
-
-# -------------------------
 # Run comparison only if both uploaded
 # -------------------------
 if burn_file and invoice_file:
