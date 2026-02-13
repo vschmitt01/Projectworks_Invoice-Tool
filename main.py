@@ -8,17 +8,44 @@ st.title("📊 Burn vs Invoice Comparison Tool")
 
 st.write("Upload Monthly Burn and Invoices CSV files to compare values.")
 
-# File uploaders
-burn_file = st.file_uploader("Upload Monthly Burn CSV", type=["csv"])
-invoice_file = st.file_uploader("Upload Invoices CSV", type=["csv"])
+# -------------------------
+# Side-by-side uploaders
+# -------------------------
+col1, col2 = st.columns(2)
 
+with col1:
+    burn_file = st.file_uploader("📂 Upload Monthly Burn CSV", type=["csv"])
+
+with col2:
+    invoice_file = st.file_uploader("📂 Upload Invoices CSV", type=["csv"])
+
+
+# -------------------------
+# File previews
+# -------------------------
+preview_rows = 10
+
+if burn_file:
+    df_burn_preview = pd.read_csv(burn_file, thousands=",")
+    st.subheader("Preview – Monthly Burn")
+    st.dataframe(df_burn_preview.head(preview_rows), use_container_width=True)
+
+if invoice_file:
+    df_invoice_preview = pd.read_csv(invoice_file, thousands=",")
+    st.subheader("Preview – Invoices")
+    st.dataframe(df_invoice_preview.head(preview_rows), use_container_width=True)
+
+
+# -------------------------
+# Run comparison only if both uploaded
+# -------------------------
 if burn_file and invoice_file:
 
-    # -------------------------
-    # Load Monthly Burn
-    # -------------------------
+    # Reload files (because Streamlit file object is consumed after read)
     df_burn = pd.read_csv(burn_file, thousands=",")
+    df_invoices = pd.read_csv(invoice_file, thousands=",")
 
+    # Rename burn columns
     df_burn.columns = [
         'Office', 
         'Project Name', 
@@ -31,6 +58,7 @@ if burn_file and invoice_file:
         'Total Burn (value)'
     ]
 
+    # Split project name
     df_burn[["Project Number", "Project Description"]] = \
         df_burn["Project Name"].str.split(n=1, expand=True)
 
@@ -49,15 +77,11 @@ if burn_file and invoice_file:
         ]
     ]
 
-    df_burn['Time Burn (value)'] = pd.to_numeric(df_burn['Time Burn (value)'], errors="coerce")
-    df_burn['Expense Burn (value)'] = pd.to_numeric(df_burn['Expense Burn (value)'], errors="coerce")
-    df_burn['Total Burn (value)'] = pd.to_numeric(df_burn['Total Burn (value)'], errors="coerce")
+    # Convert numeric columns
+    for col in ['Time Burn (value)', 'Expense Burn (value)', 'Total Burn (value)']:
+        df_burn[col] = pd.to_numeric(df_burn[col], errors="coerce")
 
-    # -------------------------
-    # Load Invoices
-    # -------------------------
-    df_invoices = pd.read_csv(invoice_file, thousands=",")
-
+    # Rename invoice columns
     df_invoices.columns = [
         'Organisation', 
         'Company', 
@@ -81,7 +105,9 @@ if burn_file and invoice_file:
         'Converted Currency'
     ]
 
-    df_invoices['Invoiced Amount'] = pd.to_numeric(df_invoices['Invoiced Amount'], errors="coerce")
+    df_invoices['Invoiced Amount'] = pd.to_numeric(
+        df_invoices['Invoiced Amount'], errors="coerce"
+    )
 
     # -------------------------
     # Merge
@@ -92,12 +118,10 @@ if burn_file and invoice_file:
         how="left"
     )
 
-    # Compute difference BEFORE fillna
     df_compare["Difference"] = (
         df_compare["Total Burn (value)"] - df_compare["Invoiced Amount"]
     )
 
-    # Comments logic
     df_compare["Comment"] = np.where(
         df_compare["Invoice #"].isna(),
         "NO INVOICE",
@@ -112,7 +136,6 @@ if burn_file and invoice_file:
         )
     )
 
-    # Replace NaN values after logic
     df_compare["Invoiced Amount"] = df_compare["Invoiced Amount"].fillna(0)
     df_compare["Difference"] = df_compare["Difference"].fillna(
         df_compare["Total Burn (value)"]
@@ -133,19 +156,18 @@ if burn_file and invoice_file:
         ]
     ]
 
-    st.success("Comparison Completed ✅")
-
-    # Show table
+    st.divider()
+    st.subheader("📊 Comparison Results")
     st.dataframe(df_export, use_container_width=True)
 
-    # Download button
+    # Download
     csv = df_export.to_csv(index=False).encode("utf-8")
     st.download_button(
-        label="Download Comparison CSV",
+        label="⬇ Download Comparison CSV",
         data=csv,
         file_name="burn_vs_invoice_comparison.csv",
         mime="text/csv"
     )
 
 else:
-    st.info("Please upload both CSV files to begin.")
+    st.info("Please upload both CSV files to run the comparison.")
