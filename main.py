@@ -159,9 +159,9 @@ if burn_file and invoice_file:
         if pd.isna(val):
             return ""
         elif val < 0:
-            return "background-color: #f8d7da;"  # Soft red
-        elif val > 0:
             return "background-color: #fff3cd;"  # Soft yellow
+        elif val > 0:
+            return "background-color: #f8d7da;"  # Soft red
         else:
             return "background-color: #d4edda;"  # Soft green
         
