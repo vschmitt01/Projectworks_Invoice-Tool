@@ -14,7 +14,7 @@ st.write("Upload Monthly Burn and Invoices CSV files to compare values.")
 col1, col2 = st.columns(2)
 
 with col1:
-    burn_file = st.file_uploader("📂 Upload Monthly Burn CSV", type=["csv"])
+    burn_file = st.file_uploader("📂 Upload Burn CSV", type=["csv"])
 
 with col2:
     invoice_file = st.file_uploader("📂 Upload Invoices CSV", type=["csv"])
