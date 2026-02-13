@@ -142,7 +142,26 @@ if burn_file and invoice_file:
 
     st.divider()
     st.subheader("📊 Comparison Results")
-    st.dataframe(df_export, use_container_width=True)
+    
+    # ---- Conditional formatting function ----
+    def highlight_difference(val):
+        if pd.isna(val):
+            return ""
+        elif val < 0:
+            return "background-color: #f8d7da;"  # Soft red
+        elif val > 0:
+            return "background-color: #fff3cd;"  # Soft yellow
+        else:
+            return "background-color: #d4edda;"  # Soft green
+        
+            
+    # Apply styling
+    styled_df = df_export.style.applymap(
+        highlight_difference,
+        subset=["Difference"]
+    )
+    
+    st.dataframe(styled_df, use_container_width=True)
 
     # Download
     csv = df_export.to_csv(index=False).encode("utf-8")
