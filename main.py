@@ -140,6 +140,17 @@ if burn_file and invoice_file:
         ]
     ]
 
+    numeric_cols = [
+        "Time Burn (value)",
+        "Expense Burn (value)",
+        "Total Burn (value)",
+        "Invoiced Amount",
+        "Difference"
+    ]
+    
+    df_export[numeric_cols] = df_export[numeric_cols].round(2)
+
+
     st.divider()
     st.subheader("📊 Comparison Results")
     
@@ -156,13 +167,14 @@ if burn_file and invoice_file:
         
             
     # Apply styling
-    styled_df = df_export.style.applymap(
-        highlight_difference,
-        subset=["Difference"]
+    styled_df = (
+        df_export.style
+        .format("{:,.2f}", subset=numeric_cols)  # Adds thousand separators
+        .applymap(highlight_difference, subset=["Difference"])
     )
     
     st.dataframe(styled_df, use_container_width=True)
-
+    
     # Download
     csv = df_export.to_csv(index=False).encode("utf-8")
     st.download_button(
