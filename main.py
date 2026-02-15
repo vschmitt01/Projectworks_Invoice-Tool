@@ -128,6 +128,7 @@ if burn_file and invoice_file:
     df_export = df_compare[
         [
             "Project Number", 
+            "Company",
             "Project Description",
             "Project Manager", 
             "Account Manager",
