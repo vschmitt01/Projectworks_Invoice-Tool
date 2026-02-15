@@ -120,6 +120,9 @@ if burn_file and invoice_file:
         )
     )
 
+    df_export["Company"] = df_export["Company"].replace(0, np.nan)
+    df_export["Company"] = df_export["Company"].fillna("-")
+    
     df_compare["Invoiced Amount"] = df_compare["Invoiced Amount"].fillna(0)
     df_compare["Difference"] = df_compare["Difference"].fillna(
         df_compare["Total Burn (value)"]
