@@ -174,7 +174,7 @@ if burn_file and invoice_file:
     styled_df = (
         df_export.style
         .format("{:,.2f}", subset=numeric_cols)  # Adds thousand separators
-        .applymap(highlight_difference, subset=["Difference"])
+        .map(highlight_difference, subset=["Difference"])
     )
     
     st.dataframe(styled_df, use_container_width=True)
