@@ -71,6 +71,7 @@ if burn_file and invoice_file:
         'Company', 
         'Project Number', 
         'Project', 
+        'Description',
         'Invoice #',
         'Reference', 
         'Email Recipients', 
